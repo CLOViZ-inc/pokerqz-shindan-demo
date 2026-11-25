@@ -36,7 +36,7 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
 @keyframes in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 
 /* start */
-.hero{flex:1;display:flex;flex-direction:column;justify-content:center;gap:18px;text-align:center;padding:10px 0 24px}
+.hero{display:flex;flex-direction:column;gap:16px;text-align:center;padding:4vh 0 24px} /* X のアプリ内ブラウザでも開始ボタンが最初の画面に入るよう、上から詰める */
 .suits{font-size:28px;letter-spacing:10px;color:var(--muted)}
 .suits b{color:var(--red);font-weight:400}
 h1{font-family:"Dela Gothic One",sans-serif;font-weight:400;font-size:clamp(30px,9vw,44px);line-height:1.25;letter-spacing:.01em}
@@ -45,7 +45,7 @@ h1 em{font-style:normal;color:var(--orange)}
 .lead{color:var(--muted);font-size:15px;line-height:1.8}
 .crit{display:flex;flex-wrap:wrap;justify-content:center;gap:6px}
 .crit span{font-size:12px;font-weight:700;padding:4px 10px;border-radius:99px;background:var(--card);border:1px solid var(--line)}
-.flags{font-size:30px;letter-spacing:6px;line-height:1.5}
+.flags{font-size:26px;letter-spacing:2px;line-height:1.4;white-space:nowrap}
 .btn{display:block;width:100%;padding:17px 18px;border-radius:14px;font-weight:900;font-size:17px;text-align:center;text-decoration:none}
 .btn.main{background:var(--orange);color:#1a1205;box-shadow:0 6px 0 #a7650a}
 .btn.main:active{transform:translateY(3px);box-shadow:0 3px 0 #a7650a}
@@ -197,8 +197,8 @@ footer{margin-top:26px;font-size:11px;color:var(--muted);line-height:1.8;text-al
       <h1>あなたが<br><em>行くべき</em><br>ポーカースポット<br>診断</h1>
       <p class="lead">あなたにピッタリの世界のカジノを紹介。</p>
       <div class="flags">🇹🇼🇰🇷🇵🇭🇰🇭🇲🇴🇺🇸🇪🇸🇦🇺🇺🇾🇯🇵</div>
+      <button class="btn main" id="startBtn">診断スタート</button>
     </div>
-    <button class="btn main" id="startBtn">診断スタート</button>
   </section>
 
   <!-- QUIZ (chat) -->
