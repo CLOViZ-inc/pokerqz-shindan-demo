@@ -310,6 +310,7 @@ const LP_URL = 'https://pokerqz.com/ja?utm_source=x&utm_medium=organic&utm_campa
 const HASHTAG = 'ポーカースポット診断';
 // 会場の写真（/shindan/spot/img/。出典と作者は README.md）
 const IMGDATA = {
+  jp:'/pokerqz-shindan-demo/img/jp.jpg',
   bel:'/pokerqz-shindan-demo/img/bel.jpg',
   cb:'/pokerqz-shindan-demo/img/cb.jpg',
   cod:'/pokerqz-shindan-demo/img/cod.jpg',
@@ -432,7 +433,7 @@ const VENUES = {
   bcn:{ cb:{n:'Casino Barcelona',img:{f:'img/cb.jpg',a:'Zarateman',l:'CC0',p:'https://commons.wikimedia.org/wiki/File:Barcelona_-_Casino_de_Barcelona_y_Hotel_Arts.jpg'},u:'https://www.casinobarcelona.com/en/poker-cash',q:'Casino Barcelona',sh:'Casino Barcelona',pt:'EPT バルセロナの会場',d:'EPT バルセロナの会場。€1/3 から。低レートのレーキは5%・上限€10',t:'EPT は例年8月ごろ'} },
   mel:{ crown:{n:'Crown Melbourne',img:{f:'img/crown.jpg',a:'Gary Houston',l:'CC0',p:'https://commons.wikimedia.org/wiki/File:Crown_Casino_Complex_Melbourne_20180723-002.jpg'},u:'https://www.crownmelbourne.com.au/casino/table-games/poker',q:'Crown Melbourne Poker Room',sh:'Crown Melbourne',pt:'A$1/$3 から・ホテルと一体のリゾート',d:'A$1/$3 から。レーキ10%・上限A$25（ピーク時A$30）。平日は10時〜翌4時、週末は通しで営業',t:'Aussie Millions は2027年4/8〜24'} },
   pun:{ enjoy:{n:'Enjoy Punta del Este',img:{f:'img/enjoy.jpg',a:'Paulo JC Nogueira',l:'CC BY-SA 3.0',p:'https://commons.wikimedia.org/wiki/File:Cassino_Conrad%2C_Punta_del_Este_-_Uruguai_-_panoramio.jpg'},u:'https://enjoypuntadeleste.uy/poker/',q:'Enjoy Punta del Este',sh:'Enjoy Punta del Este',pt:'ビーチリゾートのホテル併設カジノ',d:'週ごとの大会（参加費の10%が運営費）と、年1〜2回の Enjoy Poker Series。12月には Gran Final Millonaria',t:'シリーズの時期は年ごとに違う'} },
-  jpn:{ amu:{n:'近くのアミューズメントポーカー店',q:'アミューズメントポーカー',sh:'',pt:'換金なしで気楽に打てる',d:'お金を賭けない（換金なし）お店。参加費は1日3,000〜1万円ほど'} },
+  jpn:{ amu:{n:'近くのアミューズメントポーカー店',img:{f:'img/jp.jpg',t:'イメージ'},q:'アミューズメントポーカー',sh:'',pt:'換金なしで気楽に打てる',d:'お金を賭けない（換金なし）お店。参加費は1日3,000〜1万円ほど'} },
 };
 
 /* ================= 判定用の点数（1〜5・編集部の目安） ================= */
@@ -788,7 +789,7 @@ function renderResult(k1, k2){
     $('vDesc').textContent = V.main.d + (V.tour && V.main.t ? '。' + V.main.t : '');
     const mapUrl = q => 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(q);
     if (V.main.q) { $('vMap').href = mapUrl(V.main.q); $('vMap').style.display = ''; } else { $('vMap').style.display = 'none'; }
-    if (V.main.img) { $('vImg').src = IMGDATA[V.main.img.f.replace(/^img\/|\.jpg$/g,'')] || V.main.img.f; $('vImg').alt = V.main.n; $('vCredit').textContent = `${V.main.img.cap ? V.main.img.cap + '｜' : ''}${V.main.img.a} / ${V.main.img.l}（${V.main.img.s || 'Wikimedia Commons'}）`; $('vCredit').href = V.main.img.p; $('vPhoto').style.display = ''; $('vImg').onerror = ()=>{ $('vPhoto').style.display = 'none'; }; } else { $('vPhoto').style.display = 'none'; }
+    if (V.main.img) { $('vImg').src = IMGDATA[V.main.img.f.replace(/^img\/|\.jpg$/g,'')] || V.main.img.f; $('vImg').alt = V.main.n; if (V.main.img.t) { $('vCredit').textContent = V.main.img.t; $('vCredit').removeAttribute('href'); } else { $('vCredit').textContent = `${V.main.img.cap ? V.main.img.cap + '｜' : ''}${V.main.img.a} / ${V.main.img.l}（${V.main.img.s || 'Wikimedia Commons'}）`; $('vCredit').href = V.main.img.p; } $('vPhoto').style.display = ''; $('vImg').onerror = ()=>{ $('vPhoto').style.display = 'none'; }; } else { $('vPhoto').style.display = 'none'; }
     $('vPh').style.display = V.main.img ? 'none' : 'flex';
     if (V.main.u) { $('vSite').href = V.main.u; $('vSite').style.display = ''; } else { $('vSite').style.display = 'none'; }
     $('vOthers').innerHTML = V.others.length ? '<div class="voth"><h4>ほかの候補</h4>' + V.others.map(o=>`<p><b>${esc(o.n)}</b>　${esc(o.d)}${(o.q||o.u) ? `<br>${o.q?`<a class="map" href="${mapUrl(o.q)}" target="_blank" rel="noopener">📍 地図</a>`:''} ${o.u?`<a class="map" href="${o.u}" target="_blank" rel="noopener">🌐 公式</a>`:''}` : ''}</p>`).join('') + '</div>' : '';
