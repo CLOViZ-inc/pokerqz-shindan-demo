@@ -124,7 +124,7 @@ h1 em{font-style:normal;color:var(--orange)}
 .rhead{display:flex;align-items:center;justify-content:center;gap:14px;margin-top:2px}
 .rhead .rflag{font-size:56px}
 .rname{text-align:left}
-.rname .rspot{margin-top:0;line-height:1.2}
+.rname .rspot{margin-top:0;line-height:1.2;white-space:nowrap}
 .back{font-size:14px;color:var(--muted);padding:6px 0 12px;align-self:flex-start}
 .rmatch{display:inline-block;margin-top:12px;font-weight:900;font-size:14px;background:var(--orange);color:#1a1205;padding:4px 12px;border-radius:99px}
 .rcatch{font-size:15px;line-height:1.7;font-weight:700;margin-bottom:10px}
@@ -779,6 +779,9 @@ function renderResult(k1, k2){
     $('rType').innerHTML = s.type.split(' ').map(esc).join('<br>');
     $('rFlag').textContent = s.flag;
     $('rSpot').textContent = s.name;
+    // 長い都市名（日本のアミューズ・プンタ・デル・エステ）は1行に収まるよう文字を小さくする
+    const n = s.name.length;
+    $('rSpot').style.fontSize = n <= 5 ? '' : (n <= 7 ? '30px' : (n <= 8 ? '26px' : '22px'));
     $('rPlace').textContent = s.place;
     const V = pickVenue(k1, ans); result.venue = V.main;
     $('vName').textContent = V.main.n;
