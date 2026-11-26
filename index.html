@@ -829,7 +829,10 @@ function renderResult(k1, k2){
 function shareUrl(){ return SHARE_BASE + '/r/' + result.k1; } // 結果ごとの OGP ページ（r/<結果>.html）
 function setShareLink(){ // ポップアップが止められる環境でも動くよう、普通のリンクにしておく
   const s = SPOTS[result.k1];
-  const text = `私は「${s.type}」\n行くべきポーカースポットは ${s.flag}${s.name}${result.venue && result.venue.sh ? '（' + result.venue.sh + '）' : ''}でした\n\n#${HASHTAG}`;
+  const sh = result.venue && result.venue.sh ? '「' + result.venue.sh + '」' : '';
+  const text = result.k1 === 'jpn' // 日本の結果は自虐のオチにする
+    ? `私の行くべきポーカースポットは\n${s.flag}${s.name}でした\n\n海外はまだ早いらしい…\nあなたはどこ？\n\n#${HASHTAG}`
+    : `私の行くべきポーカースポットは\n${s.flag}${s.name}${sh}でした\n\n${s.type}らしい\nあなたはどこ？\n\n#${HASHTAG}`;
   $('shareX').href = 'https://x.com/intent/post?text=' + encodeURIComponent(text) + '&url=' + encodeURIComponent(shareUrl());
 }
 
