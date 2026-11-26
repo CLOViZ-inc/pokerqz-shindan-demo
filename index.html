@@ -47,6 +47,7 @@ h1 em{font-style:normal;color:var(--orange)}
 .crit span{font-size:12px;font-weight:700;padding:4px 10px;border-radius:99px;background:var(--card);border:1px solid var(--line)}
 .flags{font-size:26px;letter-spacing:2px;line-height:1.4;white-space:nowrap}
 .btn[hidden]{display:none}
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
 html.lock,html.lock body{height:100%;overflow:hidden}
 .btn{display:block;width:100%;padding:17px 18px;border-radius:14px;font-weight:900;font-size:17px;text-align:center;text-decoration:none}
 .btn.main{background:var(--orange);color:#1a1205;box-shadow:0 6px 0 #a7650a}
@@ -205,13 +206,13 @@ footer{margin-top:26px;font-size:11px;color:var(--muted);line-height:1.8;text-al
   <!-- QUIZ (chat) -->
   <section class="screen" id="s-quiz">
     <div class="prog"><div class="bar"><i id="barFill"></i></div><small id="progText"></small><button class="restart" id="restartBtn">やり直す</button></div>
-    <div class="chat" id="chat"></div>
+    <div class="chat" id="chat" role="log" aria-live="polite"></div>
     <div class="opts" id="opts"></div>
   </section>
 
   <!-- LOADING -->
   <section class="screen" id="s-load">
-    <div class="loading">
+    <div class="loading" role="status" aria-live="polite">
       <div class="spin">🎰</div>
       <ul class="steps" id="steps">
         <li>打ちたいゲームとレートで会場をしぼる</li>
@@ -590,21 +591,23 @@ function rel(q, ai, k, ans){
   return (d > 0 && same >= 0.4) ? Math.min(d, 0.5) : d; // 多くの都市が同点＝「条件を満たす」だけなので ○ どまり
 }
 // 答えから、その都市のどのお店を推すか決める（ans が空＝共有リンクから来た人は既定のお店）
+const VENUE_PICK = {}; // 共有リンクで指定されたお店（?v=）
 function pickVenue(k, ans){
-  const cash = ans.fmt!==undefined && isCash(ans), tour = ans.fmt===1, high = ans.stake===1;
+  const cash = ans.fmt!==undefined && isCash(ans), tour = ans.fmt!==undefined && isTour(ans), high = ans.stake===1;
   let key;
   switch (k) {
     case 'tpe': key = 'rs'; break;
     case 'mnl': key = 'okada'; break;
-    case 'cju': key = (ans.fmt===1) ? 'lesa' : 'dt'; break;
+    case 'cju': key = tour ? 'lesa' : 'dt'; break;
     case 'mfm': key = ans.rake===0 ? 'ven' : 'mgm'; break;
     case 'las': key = tour ? (ans.tour===1 ? 'ven' : 'hs') : ((cash && !high && (ans.rake===0 || ans.promo===0 || ans.promo===1)) ? 'ven' : 'bel'); break; // ベネチアンは上限$5・ジャックポット/ハイハンド賞あり
     case 'jpn': key = 'amu'; break;
     default: key = Object.keys(VENUES[k])[0];
   }
+  if (VENUE_PICK[k] && VENUES[k][VENUE_PICK[k]]) key = VENUE_PICK[k];
   const v = VENUES[k], main = v[key];
   const pt = (high && main.ptHigh) ? main.ptHigh : main.pt;
-  return {main, pt, others: Object.keys(v).filter(x=>x!==key).map(x=>v[x]), tour};
+  return {main, pt, others: Object.keys(v).filter(x=>x!==key).map(x=>v[x]), tour, key};
 }
 /* ================= あなただけのポーカー旅プラン ================= */
 // arrive=到着まで nature/city/night=観光の答え別 market=夜市 food=名物 korean/canton=料理の答え別 low/high=卓の例 trip=日数 prep=都市ごとの準備
@@ -692,8 +695,10 @@ function basePath(){ try { return location.pathname || ''; } catch(e){ return ''
 
 let ans = {}, cur = null, result = null, busy = false, runId = 0, fromShare = false;
 
-function show(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('on', s.id===id)); document.querySelector('.app').classList.toggle('quiz', id==='s-quiz'); document.documentElement.classList.toggle('lock', id==='s-quiz'); window.scrollTo(0,0); }
-function toBottom(){ const c = $('chat'); requestAnimationFrame(()=>{ c.scrollTo({top:c.scrollHeight, behavior:'smooth'}); }); }
+function show(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('on', s.id===id)); document.querySelector('.app').classList.toggle('quiz', id==='s-quiz'); document.documentElement.classList.toggle('lock', id==='s-quiz'); window.scrollTo(0,0);
+  const f = id==='s-result' ? $('rSpot') : (id==='s-plan' ? document.querySelector('#s-plan h3') : null); // 結果・旅プランに切り替えたら見出しへ移動
+  if (f) { f.setAttribute('tabindex','-1'); try { f.focus({preventScroll:true}); } catch(e){} } }
+function toBottom(){ const c = $('chat'); requestAnimationFrame(()=>{ c.scrollTo({top:c.scrollHeight, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'}); }); }
 let optsMax = 0; // 選択肢エリアの高さは縮めない（ボタンの位置を固定するため）
 // 最初に、選択肢がいちばん多い質問の高さを確保しておく（途中で広がると、ボタンが上にずれるため）
 function reserveOpts(){ const o = $('opts'); o.style.minHeight = '0px'; let m = 0;
@@ -747,7 +752,7 @@ $('opts').addEventListener('click', async e=>{
   else { ask(); }
 });
 function startQuiz(){
-  runId++; ans = {}; cur = null; busy = false; fromShare = false; $('tryMine').hidden = true;
+  runId++; ans = {}; cur = null; busy = false; fromShare = false; $('tryMine').hidden = true; for (const k in VENUE_PICK) delete VENUE_PICK[k];
   $('chat').innerHTML = ''; $('opts').innerHTML = '';
   safeReplace(basePath());
   show('s-quiz'); reserveOpts(); ask();
@@ -788,7 +793,7 @@ function renderResult(k1, k2){
     const n = s.name.length;
     $('rSpot').style.fontSize = n <= 5 ? '' : (n <= 7 ? '30px' : (n <= 8 ? '26px' : '22px'));
     $('rPlace').textContent = s.place;
-    const V = pickVenue(k1, ans); result.venue = V.main;
+    const V = pickVenue(k1, ans); result.venue = V.main; result.vkey = V.key;
     $('vName').textContent = V.main.n;
     $('vDesc').textContent = V.main.d + (V.tour && V.main.t ? '。' + V.main.t : '');
     const mapUrl = q => 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(q);
@@ -830,7 +835,9 @@ function renderResult(k1, k2){
   show('s-result');
 }
 
-function shareUrl(){ return SHARE_BASE + '/r/' + result.k1; } // 結果ごとの OGP ページ（r/<結果>.html）
+function defaultVenueKey(k){ const o = VENUE_PICK[k]; delete VENUE_PICK[k]; const key = pickVenue(k, {}).key; if (o) VENUE_PICK[k] = o; return key; }
+function venueSuffix(){ return result.vkey && result.vkey !== defaultVenueKey(result.k1) ? result.vkey : ''; }
+function shareUrl(){ const v = venueSuffix(); return SHARE_BASE + '/r/' + result.k1 + (v ? '-' + v : ''); } // 結果ごとの OGP ページ（r/<結果>.html）
 function setShareLink(){ // ポップアップが止められる環境でも動くよう、普通のリンクにしておく。URL は末尾に付け、X に結果画像のカードを大きく出させる（本文の URL は X が隠す）
   const s = SPOTS[result.k1];
   const sh = result.venue && result.venue.sh ? '「' + result.venue.sh + '」' : '';
@@ -925,6 +932,7 @@ let qp; try { qp = new URLSearchParams(location.search); } catch(e){ qp = new UR
 if (SPOTS[qp.get('r')]) {
   const k2 = SPOTS[qp.get('s')] && qp.get('s')!==qp.get('r') ? qp.get('s') : ORDER.find(k=>k!==qp.get('r'));
   fromShare = true;
+  if (qp.get('v') && VENUES[qp.get('r')][qp.get('v')]) VENUE_PICK[qp.get('r')] = qp.get('v');
   renderResult(qp.get('r'), k2);
   $('tryMine').hidden = false;
 }
