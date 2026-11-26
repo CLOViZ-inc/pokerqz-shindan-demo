@@ -8,7 +8,7 @@
 <meta property="og:title" content="あなたが行くべきポーカースポット診断">
 <meta property="og:description" content="レート・レーキ・予算・ごはん・観光から判定。台北？マニラ？ラスベガス？それとも国内？">
 <meta property="og:type" content="website">
-<meta property="og:image" content="https://cloviz-inc.github.io/pokerqz-shindan-demo/og/default.png">
+<meta property="og:image" content="https://cloviz-inc.github.io/pokerqz-shindan-demo/og/default.jpg">
 <meta property="og:url" content="https://cloviz-inc.github.io/pokerqz-shindan-demo">
 <link rel="canonical" href="https://cloviz-inc.github.io/pokerqz-shindan-demo">
 <meta name="robots" content="noindex">
@@ -834,8 +834,8 @@ function setShareLink(){ // ポップアップが止められる環境でも動�
   const s = SPOTS[result.k1];
   const sh = result.venue && result.venue.sh ? '「' + result.venue.sh + '」' : '';
   const text = result.k1 === 'jpn' // 日本の結果は自虐のオチにする
-    ? `私の行くべきポーカースポットは\n${s.flag}${s.name}でした\n\n海外はまだ早いらしい…\nあなたはどこ？\n\n#${HASHTAG}`
-    : `私の行くべきポーカースポットは\n${s.flag}${s.name}${sh}でした\n\n${s.type}らしい\nあなたはどこ？\n\n#${HASHTAG}`;
+    ? `行くべきポーカースポットは\n${s.flag}${s.name}でした\n\n海外はまだ早いらしい…\nあなたはどこ？\n\n#${HASHTAG}`
+    : `行くべきポーカースポットは\n${s.flag}${s.name}${sh}でした\n\n${s.type}らしい\nあなたはどこ？\n\n#${HASHTAG}`;
   $('shareX').href = 'https://x.com/intent/post?text=' + encodeURIComponent(text) + '&url=' + encodeURIComponent(shareUrl());
 }
 
