@@ -830,13 +830,13 @@ function renderResult(k1, k2){
 }
 
 function shareUrl(){ return SHARE_BASE + '/r/' + result.k1; } // 結果ごとの OGP ページ（r/<結果>.html）
-function setShareLink(){ // ポップアップが止められる環境でも動くよう、普通のリンクにしておく。URL はハッシュタグの前に置き、本文に文字として残す（末尾だと X が URL を隠してカードだけになる）
+function setShareLink(){ // ポップアップが止められる環境でも動くよう、普通のリンクにしておく。URL は末尾に付け、X に結果画像のカードを大きく出させる（本文の URL は X が隠す）
   const s = SPOTS[result.k1];
   const sh = result.venue && result.venue.sh ? '「' + result.venue.sh + '」' : '';
   const text = result.k1 === 'jpn' // 日本の結果は自虐のオチにする
-    ? `私の行くべきポーカースポットは\n${s.flag}${s.name}でした\n\n海外はまだ早いらしい…\nあなたはどこ？\n${shareUrl()}\n\n#${HASHTAG}`
-    : `私の行くべきポーカースポットは\n${s.flag}${s.name}${sh}でした\n\n${s.type}らしい\nあなたはどこ？\n${shareUrl()}\n\n#${HASHTAG}`;
-  $('shareX').href = 'https://x.com/intent/post?text=' + encodeURIComponent(text);
+    ? `私の行くべきポーカースポットは\n${s.flag}${s.name}でした\n\n海外はまだ早いらしい…\nあなたはどこ？\n\n#${HASHTAG}`
+    : `私の行くべきポーカースポットは\n${s.flag}${s.name}${sh}でした\n\n${s.type}らしい\nあなたはどこ？\n\n#${HASHTAG}`;
+  $('shareX').href = 'https://x.com/intent/post?text=' + encodeURIComponent(text) + '&url=' + encodeURIComponent(shareUrl());
 }
 
 /* ---- 結果画像（1200x675） ---- */
