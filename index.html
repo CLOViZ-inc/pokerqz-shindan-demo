@@ -46,6 +46,8 @@ h1 em{font-style:normal;color:var(--orange)}
 .crit{display:flex;flex-wrap:wrap;justify-content:center;gap:6px}
 .crit span{font-size:12px;font-weight:700;padding:4px 10px;border-radius:99px;background:var(--card);border:1px solid var(--line)}
 .flags{font-size:26px;letter-spacing:2px;line-height:1.4;white-space:nowrap}
+.btn[hidden]{display:none}
+html.lock,html.lock body{height:100%;overflow:hidden}
 .btn{display:block;width:100%;padding:17px 18px;border-radius:14px;font-weight:900;font-size:17px;text-align:center;text-decoration:none}
 .btn.main{background:var(--orange);color:#1a1205;box-shadow:0 6px 0 #a7650a}
 .btn.main:active{transform:translateY(3px);box-shadow:0 3px 0 #a7650a}
@@ -54,7 +56,7 @@ h1 em{font-style:normal;color:var(--orange)}
 .note{font-size:11px;color:var(--muted);line-height:1.7;text-align:center;margin-top:14px}
 
 /* chat */
-.app.quiz{height:100dvh;min-height:0;padding-bottom:calc(16vh + env(safe-area-inset-bottom))} /* 指が届きやすいよう、選択肢の下に余白 */
+.app.quiz{position:fixed;top:0;bottom:0;left:0;right:0;height:auto;min-height:0;padding-bottom:calc(16vh + env(safe-area-inset-bottom))} /* 指が届きやすいよう、選択肢の下に余白 */
 .app.quiz .top{margin-bottom:10px}
 #s-quiz{min-height:0}
 .prog{display:flex;align-items:center;gap:10px;margin-bottom:6px;flex:none}
@@ -278,10 +280,7 @@ footer{margin-top:26px;font-size:11px;color:var(--muted);line-height:1.8;text-al
 
     <div class="actions">
       <a class="btn x" id="shareX" href="https://x.com/intent/post" target="_blank" rel="noopener">𝕏 で結果をポストする</a>
-      <div class="row2">
-        <button class="btn sub" id="saveImg">結果画像を保存</button>
-        <button class="btn sub" id="retry">もう一度診断</button>
-      </div>
+      <button class="btn sub" id="tryMine" hidden>わたしも診断する</button>
     </div>
   </section>
 
@@ -295,7 +294,7 @@ footer{margin-top:26px;font-size:11px;color:var(--muted);line-height:1.8;text-al
       <div id="pDays"></div>
       <div class="pbox"><h4>お金</h4><div id="pMoney"></div></div>
       <div class="pbox"><h4>出発までに</h4><ul id="pPrep"></ul></div>
-      <div class="row2 pbtn"><button class="btn sub" id="savePlanImg">画像で保存</button><button class="btn sub" id="savePlanTxt">テキストで保存</button></div>
+      <button class="btn sub pbtn" id="retry">もう一度診断</button>
     </div>
   </section>
 </div>
@@ -387,11 +386,11 @@ const SPOTS = {
     why:['南米屈指のビーチリゾート。ホテルとカジノが一体','週ごとの大会と、年1〜2回の Enjoy Poker Series がある','乗り継いで片道30時間以上。まさに地球の裏側'],
     season:'Enjoy Poker Series は年1〜2回（時期は年ごとに違う）。ビーチは南半球の夏（12〜2月）が最盛期。',
     tip:'地球の裏側まで行くなら、負けて帰るのはもったいない。POKER Q\'z で準備は万全に。'},
-  jpn:{flag:'🇯🇵',name:'日本のアミューズ',place:'国内のアミューズメントポーカー',type:'海外に行くな！ ホームで最強タイプ',
+  jpn:{flag:'🇯🇵',name:'日本のアミューズ',place:'国内のアミューズメントポーカー',type:'海外に行くな！ 日本で最強タイプ',
     catch:'あなたは海外に行かなくていい。まずは国内で、誰よりも強くなろう。',
     why:['お金を賭けない（換金なしの）お店なので、気楽にたくさん打てる','お店のトーナメントで、気軽に腕試しができる','言葉も移動も心配ゼロ。上達に集中できる'],
     season:'平日の夜でも週末でも。思い立ったその日に行ける。',
-    tip:'ホームで最強を目指すなら、まずは毎日の積み重ね。POKER Q\'z で1日10問から始めよう。'},
+    tip:'日本で最強を目指すなら、まずは毎日の積み重ね。POKER Q\'z で1日10問から始めよう。'},
 };
 const ORDER = ['tpe','icn','cju','mnl','pnh','mfm','las','lax','bcn','mel','pun','jpn']; // 同点のときの優先順
 
@@ -504,7 +503,7 @@ const QS = [
     {e:'🔥',t:'$5/$10 以上',c:'$5/$10以上',r:'高めのレートが立つ会場にしぼるね。',f:OUT(CASH_HIGH)},
   ]},
   {id:'rake', k:'レーキ', show:isCash, q:'レーキ（場代）はどれくらい気にする？', a:[
-    {e:'🧮',t:'最優先。とにかく安く',c:'レーキ最優先',r:'レーキが軽い店を優先するね。',f:(k,a,ans)=> (rakeScore(k,ans)-3)*2},
+    {e:'🧮',t:'最優先。とにかく安く',c:'レーキ最優先',r:'レーキが安いカジノを優先するね。',f:(k,a,ans)=> (rakeScore(k,ans)-3)*2},
     {e:'⚖️',t:'ほかとのバランスで',c:'レーキはほどほど',r:'了解。ほかの条件と合わせて見るね。',f:(k,a,ans)=> (rakeScore(k,ans)-3)*0.7},
     {e:'🎰',t:'気にしない。雰囲気優先',c:'雰囲気優先',r:'豪華なカジノの雰囲気を優先するね。',f:(k)=> (GLAM[k]-3)*1.5},
   ]},
@@ -629,7 +628,7 @@ function makePlan(k, ans){
   const s = SPOTS[k], V = pickVenue(k, ans), v = V.main, P = PLAN[k];
   const name = v.sh || v.n;
   if (k==='jpn') {
-    return {title:'ホームで最強になる1か月プラン', sub:'国内・アミューズメントポーカー', days:[
+    return {title:'日本で最強になる1か月プラン', sub:'国内・アミューズメントポーカー', days:[
       {d:'毎日', items:[['☀️','朝','POKER Q\'z で10問。判断のクセを毎日1つ直す']]},
       {d:'平日', items:[['🌙','夜','近くのアミューズで2時間。換金なしだから気楽に、試したいことを試す']]},
       {d:'週末', items:[['🏆','昼','お店のトーナメントに出て腕試し'],['🍜','夜','仲間と反省会。今日のハンドをアプリで復習']]},
@@ -692,9 +691,13 @@ function basePath(){ try { return location.pathname || ''; } catch(e){ return ''
 
 let ans = {}, cur = null, result = null, busy = false, runId = 0, fromShare = false;
 
-function show(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('on', s.id===id)); document.querySelector('.app').classList.toggle('quiz', id==='s-quiz'); window.scrollTo(0,0); }
+function show(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('on', s.id===id)); document.querySelector('.app').classList.toggle('quiz', id==='s-quiz'); document.documentElement.classList.toggle('lock', id==='s-quiz'); window.scrollTo(0,0); }
 function toBottom(){ const c = $('chat'); requestAnimationFrame(()=>{ c.scrollTo({top:c.scrollHeight, behavior:'smooth'}); }); }
 let optsMax = 0; // 選択肢エリアの高さは縮めない（ボタンの位置を固定するため）
+// 最初に、選択肢がいちばん多い質問の高さを確保しておく（途中で広がると、ボタンが上にずれるため）
+function reserveOpts(){ const o = $('opts'); o.style.minHeight = '0px'; let m = 0;
+  for (const q of QS){ o.innerHTML = q.a.map((a,i)=>`<button class="opt" data-i="${i}"><span class="e">${a.e}</span><span>${esc(a.t)}${a.s?`<small>${esc(a.s)}</small>`:''}</span></button>`).join(''); m = Math.max(m, o.scrollHeight); }
+  o.innerHTML = ''; optsMax = Math.max(m, 236); o.style.minHeight = optsMax + 'px'; }
 function toast(m){ const t=$('toast'); t.textContent=m; t.classList.add('on'); setTimeout(()=>t.classList.remove('on'),1800); }
 function esc(t){ return String(t).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
 
@@ -743,14 +746,15 @@ $('opts').addEventListener('click', async e=>{
   else { ask(); }
 });
 function startQuiz(){
-  runId++; ans = {}; cur = null; busy = false; fromShare = false;
+  runId++; ans = {}; cur = null; busy = false; fromShare = false; $('tryMine').hidden = true;
   $('chat').innerHTML = ''; $('opts').innerHTML = '';
   safeReplace(basePath());
-  show('s-quiz'); ask();
+  show('s-quiz'); reserveOpts(); ask();
 }
 $('startBtn').onclick = startQuiz;
 $('restartBtn').onclick = startQuiz;
 $('retry').onclick = startQuiz;
+$('tryMine').onclick = startQuiz;
 
 async function finish(){
   const id = runId;
@@ -911,31 +915,8 @@ async function drawPlan(withLogo=true){
   x.fillStyle = '#9aa6bd'; x.font = F(700,26); x.textBaseline = 'alphabetic'; x.fillText('#' + HASHTAG, PAD, H-64);
   return c;
 }
-$('savePlanImg').onclick = async ()=>{
-  let blob;
-  try { blob = await toBlob(await drawPlan(true)); } catch(e){ try { blob = await toBlob(await drawPlan(false)); } catch(e2){ toast('この画面では保存できません'); return; } }
-  saveFile(blob, `poker-trip-plan-${result.k1}.png`);
-};
 $('openPlan').onclick = ()=> show('s-plan');
 $('backPlan').onclick = ()=> show('s-result');
-$('savePlanTxt').onclick = ()=> saveFile(new Blob([planText(result.plan)], {type:'text/plain'}), `poker-trip-plan-${result.k1}.txt`);
-$('saveImg').onclick = async ()=>{
-  let blob;
-  try { blob = await toBlob(await drawCard(true)); }
-  catch(e){ try { blob = await toBlob(await drawCard(false)); } catch(e2){ toast('この画面では保存できません'); return; } }
-  const fname = `poker-spot-${result.k1}.png`;
-  if (dlNs) { // claude.ai の Artifact で開いているときは、公開先の保存機能を使う
-    try { await dlNs.save({filename: fname, data: blob}); toast('画像を保存しました'); }
-    catch(e){ if (e && e.code === 'declined') return; toast(e && e.code === 'host_unavailable' ? 'ブラウザで開くと保存できます' : 'この画面では保存できません。スクショでどうぞ'); }
-    return;
-  }
-  const file = new File([blob], fname, {type:'image/png'});
-  if (navigator.canShare && navigator.canShare({files:[file]})) {
-    try { await navigator.share({files:[file], text:`#${HASHTAG}`}); return; } catch(e){}
-  }
-  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = file.name; a.click();
-  toast('画像を保存しました');
-};
 
 // 共有リンクから来た人には結果をそのまま見せる
 let qp; try { qp = new URLSearchParams(location.search); } catch(e){ qp = new URLSearchParams(''); }
@@ -943,7 +924,7 @@ if (SPOTS[qp.get('r')]) {
   const k2 = SPOTS[qp.get('s')] && qp.get('s')!==qp.get('r') ? qp.get('s') : ORDER.find(k=>k!==qp.get('r'));
   fromShare = true;
   renderResult(qp.get('r'), k2);
-  $('retry').textContent = 'わたしも診断する';
+  $('tryMine').hidden = false;
 }
 }
 </script>
