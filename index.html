@@ -56,14 +56,14 @@ html.lock,html.lock body{height:100%;overflow:hidden}
 .note{font-size:11px;color:var(--muted);line-height:1.7;text-align:center;margin-top:14px}
 
 /* chat */
-.app.quiz{position:fixed;top:0;bottom:0;left:0;right:0;height:auto;min-height:0;padding-bottom:calc(16vh + env(safe-area-inset-bottom))} /* 指が届きやすいよう、選択肢の下に余白 */
+.app.quiz{position:fixed;top:0;bottom:0;left:0;right:0;height:auto;min-height:0;padding-bottom:calc(12px + env(safe-area-inset-bottom))} /* 画面に固定（iOS の X ブラウザで画面ごと動かないように） */
 .app.quiz .top{margin-bottom:10px}
 #s-quiz{min-height:0}
 .prog{display:flex;align-items:center;gap:10px;margin-bottom:6px;flex:none}
 .bar{flex:1;height:6px;border-radius:3px;background:var(--line);overflow:hidden}
 .bar i{display:block;height:100%;width:0;background:var(--blue);transition:width .4s}
 .prog small{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
-.chat{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;display:flex;flex-direction:column;gap:10px;padding:14px 2px 12px;-webkit-mask-image:linear-gradient(transparent,#000 18px);mask-image:linear-gradient(transparent,#000 18px)}
+.chat{flex:none;height:clamp(150px,30vh,260px);min-height:0;overflow-y:auto;overscroll-behavior:contain;display:flex;flex-direction:column;gap:10px;padding:14px 2px 12px;-webkit-mask-image:linear-gradient(transparent,#000 18px);mask-image:linear-gradient(transparent,#000 18px)}
 .chat>:first-child{margin-top:auto}
 .msg{display:flex;gap:8px;align-items:flex-end;animation:pop .25s ease}
 @keyframes pop{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
@@ -80,7 +80,7 @@ html.lock,html.lock body{height:100%;overflow:hidden}
 .typing i{width:6px;height:6px;border-radius:50%;background:var(--muted);animation:blink 1s infinite}
 .typing i:nth-child(2){animation-delay:.15s}.typing i:nth-child(3){animation-delay:.3s}
 @keyframes blink{0%,100%{opacity:.25}50%{opacity:1}}
-.opts{flex:none;min-height:236px;display:flex;flex-direction:column;justify-content:flex-start;gap:8px;padding-top:12px;border-top:1px solid var(--line)}
+.opts{flex:1 1 auto;min-height:0 !important;overflow-y:auto;overscroll-behavior:contain;display:flex;flex-direction:column;justify-content:flex-start;gap:8px;padding:12px 0 calc(24px + 8vh);border-top:1px solid var(--line)} /* 質問の高さを固定し、選択肢はその真下から並べる。選択肢の数が変わっても1つ目の位置は動かない。下の余白は端末の大きさなりに空く */
 .opt{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:11px 14px;min-height:52px;border-radius:14px;background:var(--bg2);border:1.5px solid var(--line);font-size:15px;font-weight:700;transition:transform .08s,border-color .15s;animation:pop .25s ease}
 .opt:hover{border-color:var(--blue)}
 .opt:active{transform:scale(.98)}
