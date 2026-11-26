@@ -294,7 +294,8 @@ footer{margin-top:26px;font-size:11px;color:var(--muted);line-height:1.8;text-al
       <div id="pDays"></div>
       <div class="pbox"><h4>お金</h4><div id="pMoney"></div></div>
       <div class="pbox"><h4>出発までに</h4><ul id="pPrep"></ul></div>
-      <button class="btn sub pbtn" id="retry">もう一度診断</button>
+      <a class="btn x pbtn" id="shareX2" href="https://x.com/intent/post" target="_blank" rel="noopener">𝕏 で結果をポストする</a>
+      <button class="btn sub" id="retry" style="margin-top:10px">もう一度診断</button>
     </div>
   </section>
 </div>
@@ -837,6 +838,7 @@ function setShareLink(){ // ポップアップが止められる環境でも動�
     ? `行くべきポーカースポットは\n${s.flag}${s.name}でした\n\n海外はまだ早いらしい…\nあなたはどこ？\n\n#${HASHTAG}`
     : `行くべきポーカースポットは\n${s.flag}${s.name}${sh}でした\n\n${s.type}らしい\nあなたはどこ？\n\n#${HASHTAG}`;
   $('shareX').href = 'https://x.com/intent/post?text=' + encodeURIComponent(text) + '&url=' + encodeURIComponent(shareUrl());
+  $('shareX2').href = $('shareX').href;
 }
 
 /* ---- 結果画像（1200x675） ---- */
